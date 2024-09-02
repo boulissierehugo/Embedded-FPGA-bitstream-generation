@@ -39,13 +39,13 @@ This repository contains all the necessary data to be able to generate a bitstre
 
 <div>
 
-<li> ghdl, to convert VHDL into Verilog to expend the user base,</li>
+- ghdl, to convert VHDL into Verilog to expend the user base,
 
-<li>yosys, for logic synthesis, </li>
+- yosys, for logic synthesis, 
 
-<li>nextpnr-xilinx, for placement and routing (It still remains experimental as of today and lacks stability), </li>
+- nextpnr-xilinx, for placement and routing (It still remains experimental as of today and lacks stability), 
 
-<li>prjxray, for final conversion into bitstream files. </li>
+- prjxray, for final conversion into bitstream files. 
 
 </div>
 
@@ -62,7 +62,6 @@ project-root/
 │	├── aes_script.sh
 │	└── com_axi.c
 ├── VHDL/
-│   ├── exemples_bitstream/
 │   ├── log/
 │   ├── output/
 │	├── source_zedboard/
@@ -81,7 +80,7 @@ project-root/
 # Required dependancies (TODO)
 
 
-Installer :
+Install :
 ```bash
 sudo apt-get install cmake libboost-all-dev 
 	libeigen3-dev python3-dev build-essential clang bison flex 
