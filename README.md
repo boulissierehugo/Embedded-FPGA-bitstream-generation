@@ -3,9 +3,10 @@
 
 
 This repository presents all the necessary tools needed to implement an embedded FPGA bistream generator on the following boards from Xilinx :
-<li> Zybo </li>
-<li> Zedboard </li>
+- Zybo 
+- Zedboard 
 <br>
+
 <div>
 
 The system in question requires a CPU (Central Processing Unit), an FPGA (Field Programmable Gate Arrays) as well as an embedded Linux distribution. The computer system (CPU, RAM, etc.) must be powerful enough to run an embedded Linux distribution and synthesis tools. But this same distribution must also be adapted to the limits imposed by the low resources offered by FPGA cards. 
