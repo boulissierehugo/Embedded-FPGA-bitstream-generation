@@ -1,14 +1,37 @@
+
+
+
+This repository presents all the necessary tools needed to implement an embedded FPGA bistream generator. The system in question requires a CPU (Central Processing Unit), an FPGA (Field Programmable Gate Arrays) as well as an embedded Linux distribution. The computer system (CPU, RAM, etc.) must be powerful enough to run an embedded Linux distribution and synthesis tools. But this same distribution must also be adapted to the limits imposed by the low resources offered by FPGA cards. 
+
+However, I highly recommend you to use this git as a guide to be able to run the same experiments : https://www.gricad-gitlab.univ-grenoble-alpes.fr/prostboa/zynq-foss
+
+
+
+
 # Tool-chain
 
 This repository contains all the necessary data to be able to generate a bitstream using the following tool-chain on both the Zedboard and the Zybo board : 
 
-![Local Image](img/tool-chain.drawio.png)
+![Local Image](img/tool-chain.png)
 
 <div style="text-align: center;">Fig 1 : Open-source tool-chain used to generate bitstreams on-board</div>
 
-<div>This figure displays how the tool-chain works. First, it translates all the VHDL code into Verilog. Then, the synthesis is done using Yosys which generate a netlist is the JSON format. Following this, the Nextpnr place-and-route the netlist and generate a .fasm file. Finally, Prjxray converts the .fasm file into a bitstream.</div>
 
-# Répertoire
+<div>This figure displays how the tool-chain works. There is a total of four tools :</div>
+
+<div>
+
+<li> ghdl, to convert VHDL into Verilog to expend the user base,</li>
+
+<li>yosys, for logic synthesis, </li>
+
+<li>nextpnr-xilinx, for placement and routing (It still remains experimental as of today and lacks stability), </li>
+
+<li>prjxray, for final conversion into bitstream files. </li>
+
+</div>
+
+# Repository structure
 
 ```plaintext
 project-root/
@@ -37,7 +60,7 @@ project-root/
 ```
 
 
-# Prérequis
+# Required dependancies (TODO)
 
 
 Installer :
@@ -50,11 +73,11 @@ sudo apt-get install cmake libboost-all-dev
 	virtualenv python3-pip python3-virtualenv python3.11-venv 
 	
 ```
-Installer ghdl et gtkwave (pour voir les signaux) :
+Install ghdl:
 ```bash
-sudo apt-get install ghdl gtkwave 
+sudo apt-get install ghdl 
 ```
-Installer Yosys :
+Install Yosys :
 ```bash
 sudo apt update
 sudo apt -y install yosys
@@ -62,25 +85,25 @@ sudo apt -y install yosys
 
 
 
-# Build du répertoire
+# Build
 
-Cloner ces deux répertoires : 
+Clone these two repositories : 
 ```bash
 git clone https://github.com/F4PGA/prjxray
 git clone https://github.com/gatecat/nextpnr-xilinx
 ```
 
-Dans prjxray  : 
+In prjxray  : 
 
 ```bash
 cd prjxray
 git submodule update --init --recursive 
 make build
 ./download-latest-db.sh
-make env #Pour utiliser l'environnement Python de prjxray
+make env # It creates the Python environment
 ```
 
-Dans nextpnr-xilinx : 
+In nextpnr-xilinx : 
 ```bash
 git submodule update --init --recursive 
 cd nextpnr-xilinx
@@ -90,61 +113,31 @@ git submodule init
 git submodule update
 ```
 
-Génération du fichier xc7z010.bin ou xc7z020.bin (Optionnel) : 
+Generate the xc7z010.bin and the xc7z020.bin : 
 ```bash
 cd nextpnr-xilinx
+
+# For the Zybo architecture
 python3 xilinx/python/bbaexport.py --device xc7z010clg400-1 --bba xilinx/xc7z010.bba
 ./bba/bbasm --l xilinx/xc7z010.bba ../CHIPDB/xc7z010.bin
-```
-# Pratique
 
-## Convertir du VHDL en verilog
-
-Pour convertir du VHDL en verilog, effectuer les commandes suivantes :
-```bash
-ghdl -a -fsynopsys ${fichier.vhd}
-ghdl synth -fsynopsys --out=verilog ${fichier_architecture} > ${fichier_ghdl.v}
+# For the Zedboard architecture
+python3 xilinx/python/bbaexport.py --device xc7z020clg400-1 --bba xilinx/xc7z020.bba
+./bba/bbasm --l xilinx/xc7z020.bba ../CHIPDB/xc7z020.bin
 ```
 
-## Utilisation
+# Case study
 
-Pour faire de la synthèse :
-```bash
-./${YOSYS_DIR}/yosys -p "synth_xilinx -arch xc7 -top ${TOP_ENTITY}; write_json $PROJECT_DIR/NETLIST.json" /SOURCE.v
-```
-Pour réaliser le placement-routage
-```bash
-./${NEXTPNR_DIR}/nextpnr-xilinx --chipdb $CHIPDB_DIR/$CHIPDB.bin --xdc $XDC_DIR/$XDC.xdc --json $NETLIST.json --write $NETLISTROUTED.json --fasm $FASM.fasm
-```
-Conversion fasm vers frames puis vers bitstream :
-```bash
-source ${XRAY_UTILS_DIR}/env/activate # On se met d'abord dans l'environnement Python de prjxray
-# Exemple pour la Zybo : on utilise xc7z010clg400-1
-${XRAY_UTILS_DIR}/fasm2frames.py --part xc7z010clg400-1 --db-root ${XRAY_UTILS_DIR}/../database/zynq7 FASM.fasm > FRAMES.frames
+A security related case study is included in this repository. To know more, I invite you to read this paper (TODO Comming soon) mentionning this.
 
-${XRAY_TOOLS_DIR}/xc7frames2bit --part_file ${XRAY_UTILS_DIR}/../database/zynq7/xc7z010clg400-1/part.yaml --part_name xc7z010clg400-1 --frm_file FRAMES.frames --output_file ${OUTPUT_DIR}/BITSTREAM.bit
+# License
 
-deactivate
-```
-Pour charger le bitstream sur la board (exemple Zybo)
-```bash
-openFPGALoader -b zybo_z7_10 $BITSTREAM.bit
-```
+The contents of this repository are licensed under the EUPL license.
 
-# Synthèse sur Zybo/Zedboard
+A copy of the license is provided in this repository in file LICENSE-EUPL-1.2-EN.txt.
 
-## Installation
+More information on the EUPL website.
 
-	Installation sur Petalinux : (Cf git de Damien Morlier : https://gricad-gitlab.univ-grenoble-alpes.fr/morlierd/dspnr-damienmorlier)
-
-	Installation sur Arch Linux : Utiliser le package fournis (TODO)
-
-## Utilisation
-
-	Pour utiliser les outils et générer le bitstream à partir du code source, merci d'utiliser les scripts qui utilisent des commandes similaires.
-
-	Pour charger le bitstream depuis la board : 
-	```bash
-	cat $BISTREAM.bit > /dev/xdevcfg
-	```
-
+Exception : the contents of directory hdl/zipcpu are selected AXI bridge implementations from ZipCPU repository.
+The license for these files is then Apache 2.0.
+Minor changes have been added in order to fix Yosys errors, however without real understanding of the overall implementation.

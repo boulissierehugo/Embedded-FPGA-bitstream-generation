@@ -1,8 +1,8 @@
 # Practical information
 
-## How to generate a bitstream using your top architecture ?
+## How to generate a bitstream from your architecture ?
 
-To do so, you first need to specify the location of your used tools in the Makefile.
+To do so, you first need to specify the location of your used tools in the Makefile (They can both be installed locally or globally).
 
 Following this, you just need to use the script vhdl2bitstream : 
 
@@ -16,7 +16,7 @@ Following this, you just need to use the script vhdl2bitstream :
 
 `phony : ghdl, yosys, nextpnr, frames, bitstream (DEFAULT : bitstream)`
 
-Note : please make sure your source code is in .vhd or in .v (and not .vhdl)
+Note : please make sure your source code is in .vhd or in .v and not in .vhdl as it is not supported.
 
 
 
