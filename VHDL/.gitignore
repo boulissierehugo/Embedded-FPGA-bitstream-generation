@@ -1,0 +1,5 @@
+*.fasm
+fichier_ghdl.v
+*.json
+*.cf
+*.frames
